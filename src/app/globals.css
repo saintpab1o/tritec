@@ -33,19 +33,17 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Quiz option hover animation - only on devices with hover support */
+/* Quiz option buttons - NO transitions, NO hover, NO active color changes */
+/* Mobile browsers cause ghost highlights with any of these */
 .quiz-option {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  outline: none;
 }
-@media (hover: hover) {
-  .quiz-option:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px -5px rgba(45, 58, 92, 0.15);
-  }
-}
-.quiz-option:active {
-  transform: scale(0.98);
+.quiz-option:focus {
+  outline: none;
 }
 
 /* Headshot container */
@@ -72,20 +70,6 @@ body::before {
 .animate-scale-in {
   animation: scaleIn 0.3s ease-out forwards;
 }
-
-/* Correct/incorrect flash */
-@keyframes correctPulse {
-  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-  70% { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-}
-@keyframes incorrectPulse {
-  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-  70% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-}
-.pulse-correct { animation: correctPulse 0.6s ease-out; }
-.pulse-incorrect { animation: incorrectPulse 0.6s ease-out; }
 
 /* Progress bar */
 .progress-fill {
