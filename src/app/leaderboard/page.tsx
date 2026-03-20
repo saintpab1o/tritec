@@ -66,19 +66,17 @@ export default function LeaderboardPage() {
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             {/* Table header */}
-            <div className="grid grid-cols-[48px_1fr_80px_80px_100px] gap-2 px-6 py-3 border-b border-gray-100 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="grid grid-cols-[36px_1fr_auto] gap-2 px-4 sm:px-6 py-3 border-b border-gray-100 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
               <div>#</div>
               <div>Player</div>
-              <div className="text-center">Score</div>
-              <div className="text-center">Pct</div>
-              <div className="text-right">Date</div>
+              <div className="text-right">Score</div>
             </div>
 
             <div className="divide-y divide-gray-50">
               {entries.map((entry, i) => (
                 <div
                   key={entry.id}
-                  className="lb-row grid grid-cols-[48px_1fr_80px_80px_100px] gap-2 px-6 py-3.5 items-center hover:bg-gray-50/50 transition-colors"
+                  className="lb-row grid grid-cols-[36px_1fr_auto] gap-2 px-4 sm:px-6 py-3.5 items-center"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <div>
@@ -94,13 +92,14 @@ export default function LeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="font-semibold text-gray-800 text-sm truncate">
-                    {entry.playerName}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-800 text-sm truncate">{entry.playerName}</p>
+                    <p className="text-xs text-gray-400">
+                      {new Date(entry.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </p>
                   </div>
-                  <div className="text-center text-sm font-medium text-gray-600">
-                    {entry.score}/{entry.totalQuestions}
-                  </div>
-                  <div className="text-center">
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="text-sm font-medium text-gray-600">{entry.score}/{entry.totalQuestions}</span>
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
                         entry.percentage >= 80
@@ -112,12 +111,6 @@ export default function LeaderboardPage() {
                     >
                       {entry.percentage}%
                     </span>
-                  </div>
-                  <div className="text-right text-xs text-gray-400">
-                    {new Date(entry.date).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
                   </div>
                 </div>
               ))}
