@@ -101,11 +101,8 @@ export default function QuizPage() {
   const [nameSelection, setNameSelection] = useState<{ value: string; correct: boolean } | null>(null);
   const [titleSelection, setTitleSelection] = useState<{ value: string; correct: boolean } | null>(null);
 
-  const [submitted, setSubmitted] = useState(false);
-
-  // Streak and fun facts
-  const [streak, setStreak] = useState(0);
   const [activeFunFact, setActiveFunFact] = useState<string | null>(null);
+  const [streak, setStreak] = useState(0);
   const [usedFunFacts, setUsedFunFacts] = useState<number[]>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -133,7 +130,6 @@ export default function QuizPage() {
       setCurrentIndex(0);
       setRoundNumber(rNum);
       setRoundStartIdx(startIdx);
-      setSubmitted(false);
 
       // Setup first question of round
       const emp = chunk[0];
@@ -260,22 +256,30 @@ export default function QuizPage() {
   };
 
   // Auto-submit leaderboard when round-results phase is entered
+  const lastSubmittedRound = useRef(0);
+  
   useEffect(() => {
-    if (phase === "round-results" && !submitted && playerName) {
-      setSubmitted(true);
+    if (phase === "round-results" && playerName && roundNumber > lastSubmittedRound.current) {
+      lastSubmittedRound.current = roundNumber;
       const cumulativeScore = allResults.filter((r) => r.nameCorrect && r.titleCorrect).length;
       const cumulativeTotal = allResults.length;
-      fetch("/api/leaderboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          playerName,
-          score: cumulativeScore,
-          totalQuestions: cumulativeTotal,
-        }),
-      }).catch(console.error);
+      
+      if (cumulativeTotal > 0) {
+        fetch("/api/leaderboard", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            playerName: playerName.trim(),
+            score: cumulativeScore,
+            totalQuestions: cumulativeTotal,
+          }),
+        })
+          .then((r) => r.json())
+          .then((data) => console.log("Leaderboard saved:", data))
+          .catch((e) => console.error("Leaderboard save failed:", e));
+      }
     }
-  }, [phase, submitted, playerName, allResults]);
+  }, [phase, playerName, allResults, roundNumber]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
@@ -448,7 +452,7 @@ export default function QuizPage() {
                 {showingFinal ? "Full Results" : `Round ${roundNumber} Results`}
               </h3>
             </div>
-            <div className="divide-y divide-gray-50 max-h-[480px] overflow-y-auto">
+            <div className="divide-y divide-gray-50">
               {displayResults.map((r, i) => (
                 <div key={i} className="flex items-center gap-3 px-6 py-3">
                   <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-gray-100">

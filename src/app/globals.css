@@ -33,13 +33,19 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* Quiz option hover animation */
+/* Quiz option hover animation - only on devices with hover support */
 .quiz-option {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
 }
-.quiz-option:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px -5px rgba(45, 58, 92, 0.15);
+@media (hover: hover) {
+  .quiz-option:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(45, 58, 92, 0.15);
+  }
+}
+.quiz-option:active {
+  transform: scale(0.98);
 }
 
 /* Headshot container */

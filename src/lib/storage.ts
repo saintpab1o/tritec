@@ -109,8 +109,33 @@ export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
 
 export async function addLeaderboardEntry(entry: LeaderboardEntry): Promise<LeaderboardEntry[]> {
   const leaderboard = await getLeaderboard();
-  leaderboard.push(entry);
-  leaderboard.sort((a, b) => b.percentage - a.percentage || new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  // Upsert: one entry per player name, keep whichever has more total correct
+  // If tied on total correct, keep the higher percentage
+  const existingIdx = leaderboard.findIndex(
+    (e) => e.playerName.toLowerCase() === entry.playerName.toLowerCase()
+  );
+
+  if (existingIdx !== -1) {
+    const existing = leaderboard[existingIdx];
+    // Replace if new attempt has more correct, or same correct but higher %
+    if (
+      entry.score > existing.score ||
+      (entry.score === existing.score && entry.percentage > existing.percentage)
+    ) {
+      leaderboard[existingIdx] = entry;
+    }
+    // Otherwise keep existing (their old score was better)
+  } else {
+    leaderboard.push(entry);
+  }
+
+  // Sort: primary = total correct (desc), tiebreak = percentage (desc), then date (newest)
+  leaderboard.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (b.percentage !== a.percentage) return b.percentage - a.percentage;
+    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  });
 
   if (useRedis) {
     const redis = await getRedis();

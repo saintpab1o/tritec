@@ -66,7 +66,7 @@ export const defaultEmployees: Employee[] = [
   { id: "55", firstName: "Billy", lastName: "Peterson", displayName: "Billy Peterson", title: "Facilities Engineer", headshot: "/headshots/Peterson__Billy__Facilities_Engineer_.png", gender: "M" },
   { id: "56", firstName: "Thomas", lastName: "Pienkos", displayName: "Thomas Pienkos", title: "LOA Property Manager", headshot: "/headshots/Pienkos__Thomas__LOA_Property_Manager_.png", gender: "M" },
   { id: "57", firstName: "Nick", lastName: "Priole", displayName: "Nick Priole", title: "Facilities Engineer", headshot: "/headshots/Priole__Nick__Facilities_Engineer_.png", gender: "M" },
-  { id: "58", firstName: "Biran", lastName: "Reilly", displayName: "Biran Reilly", title: "Development Associate", headshot: "/headshots/Reilly__Biran__Development_Associate_.png", gender: "M" },
+  { id: "58", firstName: "Brian", lastName: "Reilly", displayName: "Brian Reilly", title: "Development Associate", headshot: "/headshots/Reilly__Biran__Development_Associate_.png", gender: "M" },
   { id: "59", firstName: "Linda", lastName: "Rooney-LoBiondo", displayName: "Linda Rooney-LoBiondo", title: "Development Coordinator", headshot: "/headshots/Rooney-LoBiondo__Linda__Development_Coordinator_.png", gender: "F" },
   { id: "60", firstName: "Jasmin", lastName: "Sanchez", displayName: "Jasmin Sanchez", title: "Accounting Intern", headshot: "/headshots/Sanchez__Jasmin__Accounting_Intern_.png", gender: "F" },
   { id: "61", firstName: "Kevin", lastName: "Santos", displayName: "Kevin Santos", title: "Facilities Engineer", headshot: "/headshots/Santos__Kevin__Facilities_Engineer_.png", gender: "M" },
