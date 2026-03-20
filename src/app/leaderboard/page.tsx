@@ -18,10 +18,12 @@ export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/leaderboard")
+    fetch("/api/leaderboard", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
-        setEntries(data);
+        if (Array.isArray(data)) {
+          setEntries(data);
+        }
         setLoading(false);
       })
       .catch(() => setLoading(false));

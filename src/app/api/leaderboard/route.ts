@@ -7,7 +7,12 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const leaderboard = await getLeaderboard();
-    return NextResponse.json(leaderboard);
+    return NextResponse.json(leaderboard, {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "CDN-Cache-Control": "no-store",
+      },
+    });
   } catch (error) {
     console.error("Failed to get leaderboard:", error);
     return NextResponse.json({ error: "Failed to load leaderboard" }, { status: 500 });
