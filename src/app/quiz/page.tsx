@@ -106,6 +106,7 @@ export default function QuizPage() {
   const [usedFunFacts, setUsedFunFacts] = useState<number[]>([]);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const allResultsRef = useRef<QuizResult[]>([]);
 
   useEffect(() => {
     fetch("/api/employees")
@@ -210,7 +211,7 @@ export default function QuizPage() {
       setActiveFunFact(null);
       const result: QuizResult = { employee: currentEmployee, nameCorrect: false, titleCorrect: false };
       setRoundResults((prev) => [...prev, result]);
-      setAllResults((prev) => [...prev, result]);
+      setAllResults((prev) => { const next = [...prev, result]; allResultsRef.current = next; return next; });
       timerRef.current = setTimeout(() => advanceToNext(), AUTO_ADVANCE_MS);
     }
   };
@@ -223,7 +224,7 @@ export default function QuizPage() {
 
     const result: QuizResult = { employee: currentEmployee, nameCorrect: true, titleCorrect: correct };
     setRoundResults((prev) => [...prev, result]);
-    setAllResults((prev) => [...prev, result]);
+    setAllResults((prev) => { const next = [...prev, result]; allResultsRef.current = next; return next; });
 
     if (correct) {
       const newStreak = streak + 1;
@@ -260,26 +261,31 @@ export default function QuizPage() {
   
   useEffect(() => {
     if (phase === "round-results" && playerName && roundNumber > lastSubmittedRound.current) {
-      lastSubmittedRound.current = roundNumber;
-      const cumulativeScore = allResults.filter((r) => r.nameCorrect && r.titleCorrect).length;
-      const cumulativeTotal = allResults.length;
-      
-      if (cumulativeTotal > 0) {
-        fetch("/api/leaderboard", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            playerName: playerName.trim(),
-            score: cumulativeScore,
-            totalQuestions: cumulativeTotal,
-          }),
-        })
-          .then((r) => r.json())
-          .then((data) => console.log("Leaderboard saved:", data))
-          .catch((e) => console.error("Leaderboard save failed:", e));
-      }
+      // Small delay to ensure state has flushed
+      const submitTimer = setTimeout(() => {
+        lastSubmittedRound.current = roundNumber;
+        const results = allResultsRef.current;
+        const cumulativeScore = results.filter((r) => r.nameCorrect && r.titleCorrect).length;
+        const cumulativeTotal = results.length;
+        
+        if (cumulativeTotal > 0) {
+          fetch("/api/leaderboard", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              playerName: playerName.trim(),
+              score: cumulativeScore,
+              totalQuestions: cumulativeTotal,
+            }),
+          })
+            .then((r) => r.json())
+            .then((data) => console.log("Leaderboard saved:", data))
+            .catch((e) => console.error("Leaderboard save failed:", e));
+        }
+      }, 100);
+      return () => clearTimeout(submitTimer);
     }
-  }, [phase, playerName, allResults, roundNumber]);
+  }, [phase, playerName, roundNumber]);
 
   useEffect(() => {
     return () => { if (timerRef.current) clearTimeout(timerRef.current); };
@@ -303,7 +309,7 @@ export default function QuizPage() {
   };
 
   const getNameButtonClass = (name: string) => {
-    if (!nameSelection) return "bg-gray-50 hover:bg-tritec-blue/5 border-2 border-gray-100 hover:border-tritec-blue/30 text-gray-700";
+    if (!nameSelection) return "bg-gray-50 border-2 border-gray-100 text-gray-700 active:bg-tritec-blue/5";
     if (name === nameSelection.value && nameSelection.correct) return "bg-green-50 border-2 border-green-400 text-green-700 ring-2 ring-green-200";
     if (name === nameSelection.value && !nameSelection.correct) return "bg-red-50 border-2 border-red-400 text-red-600 ring-2 ring-red-200";
     if (!nameSelection.correct && name === currentEmployee.displayName) return "bg-green-50 border-2 border-green-300 text-green-700";
@@ -311,7 +317,7 @@ export default function QuizPage() {
   };
 
   const getTitleButtonClass = (title: string) => {
-    if (!titleSelection) return "bg-gray-50 hover:bg-tritec-blue/5 border-2 border-gray-100 hover:border-tritec-blue/30 text-gray-700";
+    if (!titleSelection) return "bg-gray-50 border-2 border-gray-100 text-gray-700 active:bg-tritec-blue/5";
     if (title === titleSelection.value && titleSelection.correct) return "bg-green-50 border-2 border-green-400 text-green-700 ring-2 ring-green-200";
     if (title === titleSelection.value && !titleSelection.correct) return "bg-red-50 border-2 border-red-400 text-red-600 ring-2 ring-red-200";
     if (!titleSelection.correct && title === currentEmployee.title) return "bg-green-50 border-2 border-green-300 text-green-700";
